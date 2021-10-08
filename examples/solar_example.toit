@@ -1,12 +1,7 @@
-# Solar Position
+// Copyright (C) 2021 Toitware ApS.
+// Use of this source code is governed by a Zero-Clause BSD license that can
+// be found in the EXAMPLES_LICENSE file.
 
-Can calculate the sunrise and sunset times for a given place
-and time on Earth.  Understands civil twilight, nautical
-twilight, and astronomical twilight.
-
-# Example
-
-```
 import solar_position show *
 
 TRANBJERG_LONGITUDE ::= 10.1337
@@ -27,4 +22,8 @@ main:
 
   print "Sunrise today at $today.sunrise.local"
   print "Sunset today at $today.sunset.local"
-```
+
+  today = sunrise_sunset 2021 10 08 TRANBJERG_LONGITUDE TRANBJERG_LATITUDE
+
+  print "Sunrise today at $today.sunrise.local"
+  print "Sunset today at $today.sunset.local"
