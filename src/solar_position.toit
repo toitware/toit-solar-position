@@ -8,10 +8,10 @@ import math show *
 Describes sunrise and sunset for a given date.
 */
 class Transitions:
-  /// The time of sunrise, or null if the sun does not rise.
+  /// The time of sunrise, or null if the Sun does not rise.
   sunrise /Time?
 
-  /// The time of sunset, or null if the sun does not set.
+  /// The time of sunset, or null if the Sun does not set.
   sunset /Time?
 
   constructor .sunrise/Time .sunset/Time:
@@ -27,13 +27,13 @@ class Transitions:
     sunrise = null
     dark_ = false
 
-  dark_ /bool
+  dark_ /bool?
 
-  /// Whether the sun is below the horizon the entire day.
+  /// Whether the Sun is below the horizon the entire day.
   always_dark -> bool:
     return not sunrise and dark_
 
-  /// Is the sun above the horizon the entire day.
+  /// Is the Sun above the horizon the entire day.
   always_light -> bool:
     return not sunset and not dark_
 
@@ -69,14 +69,14 @@ days_since_2000 time/Time -> float:
   return seconds / (24.0 * 60 * 60 )
 
 /**
-The declination of the sun for a given time of year.
+The declination of the Sun for a given time of year.
 */
 declination time/Time -> float:
   return declination time --time=time --longitude=0.0: | mean_anomaly |
     null
 
 /**
-The declination of the sun for a given time of year.
+The declination of the Sun for a given time of year.
 $noon should be the UTC noon for the day of interest.
 $time should be a time in the same day for which the
   mean anomaly is wanted.
@@ -210,28 +210,29 @@ NAUTICAL := -12.0
 ASTRONOMICAL := -18.0
 
 /**
-Variant of $sunrise_sunset that takes a Time.
+Variant of $sunrise_sunset that takes a date as three ints.
 */
 sunrise_sunset year/int month/int day/int longitude/float latitude/float type/num=0.0 --noaa_elevation_correction=false -> Transitions:
   time := Time.utc year month day 12
   return sunrise_sunset time --time=time longitude latitude type --noaa_elevation_correction=noaa_elevation_correction
 
 /**
-Returns a two-element List with the sunrise for the given day at the given
-  location.  The location is in degrees (East and North are positive).
+Returns an instance of the $Transitions class containing the sunrise and
+  sunset times for the given day at the given location.  The location is
+  given as $longitude and $latitude in degrees (East and North are positive).
 The time will normally be noon UTC on the day of interest.  For a slightly
   more accurate result, especially near the Arctic or Antarctic circles
   you can additionally specify a time near the actual sunset/sunrise, in
   which case that part of the result will have slightly improved accuracy.
-The sunset doesn't happen until the sun is physically below the horizon.  How
+The sunset doesn't happen until the Sun is physically below the horizon.  How
   far below it needs to go depends on the type of sunset.
   Type is 0, -6, -12 or -18 for geometric, civil, nautical, or astronomical.
-  Default is the simple sunrise/sunset where the center of the sun aligns
+  Default is the simple sunrise/sunset where the center of the Sun aligns
   with the horizon.
-On a day and location where the sun does not rise or set, both of the
+On a day and location where the Sun does not rise or set, both of the
   times will be null.
 The calculation compensates for the refraction caused by the curvature of the
-  atmosphere relative to the Sun's rays.  By default it considers the sun to
+  atmosphere relative to the Sun's rays.  By default it considers the Sun to
   have set when it is actually 0.833 degrees under the horizon.  Use
   --noaa_elevation_correction to get the slightly smaller correction given by
   $elevation_correction.
