@@ -9,14 +9,12 @@ Describes sunrise and sunset for a given date.
 */
 class Transitions:
   /// The time of sunrise, or null if the sun does not rise.
-  sunrise/Time? := ?
+  sunrise /Time?
 
   /// The time of sunset, or null if the sun does not set.
-  sunset/Time? := ?
+  sunset /Time?
 
-  constructor sunrise/Time sunset/Time:
-    this.sunrise = sunrise
-    this.sunset = sunset
+  constructor .sunrise/Time .sunset/Time:
     dark_ = null
 
   constructor.dark:
@@ -29,21 +27,19 @@ class Transitions:
     sunrise = null
     dark_ = false
 
-  dark_/bool? := ?
+  dark_ /bool
 
-  /// Is the sun below the horizon the entire day.
+  /// Whether the sun is below the horizon the entire day.
   always_dark -> bool:
-    return sunrise == null and dark_
+    return not sunrise and dark_
 
   /// Is the sun above the horizon the entire day.
   always_light -> bool:
-    return sunset == null and not dark_
+    return not sunset and not dark_
 
   stringify -> string:
-    if always_light:
-      return "Always light"
-    if always_dark:
-      return "Always dark"
+    if always_light: return "Always light"
+    if always_dark: return "Always dark"
     return "Sunrise: $sunrise, Sunset: $sunset"
 
 SIN_AXIAL_TILT_ ::= sin
@@ -258,12 +254,9 @@ sunrise_sunset noon/Time --time/Time=noon longitude/float latitude/float type/nu
     correction = type == 0 ? (degrees_to_radians_ 0.833) : 0.0
   subhorizon_angle ::= (degrees_to_radians_ type) - correction
   acos_input := ((sin subhorizon_angle) - sinsin) / coscos
-  if acos_input < -1.0:
-    return Transitions.light
-  else if acos_input > 1.0:
-    return Transitions.dark
-  else if acos_input.is_nan:
-    return Transitions.light
+  if acos_input < -1.0: return Transitions.light
+  else if acos_input > 1.0: return Transitions.dark
+  else if acos_input.is_nan: return Transitions.light
   half_day := (acos acos_input) * TWO_PI_RECIPROCAL_  // Time in days from solar noon to sunrise/sunset.
   half_duration := Duration --ns=(half_day * NANOSECONDS_PER_DAY_).to_int
   sunrise := transit - half_duration
