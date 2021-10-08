@@ -1,0 +1,5 @@
+prefixes:
+  solar_position: ..
+packages:
+  ..:
+    path: ..
