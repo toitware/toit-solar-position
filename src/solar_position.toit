@@ -42,6 +42,86 @@ class Transitions:
     if always_dark: return "Always dark"
     return "Sunrise: $sunrise, Sunset: $sunset"
 
+/**
+Describes the position of the Sun in the sky.
+*/
+class SolarPosition:
+  /**
+  The angle between the Sun's rays and the horizontal.  This will be around
+    zero at sunrise and sunset, and will be at its highest around noon.
+  The value will always be between 0 and PI/2 radians.
+  */
+  elevation_radians /float
+
+  /**
+  The angle between the Sun's rays and the horizontal.  This will be around
+    zero at sunrise and sunset, and will be at its highest around noon.
+  The value will always be between 0 and 90 degrees.
+  */
+  elevation_degrees -> float:
+    return radians_to_degrees_ elevation_radians
+
+  /**
+  The compass source of the Sun's rays.  This will be in the West (somewhere
+    around 3/2 PI radians) in the morning, and in the East (somewhere around PI/2
+    radians) in the evening.  North of the Tropic of Cancer it will be in the
+    South in the middle of the day (somewhere around PI radians), while South of
+    the Tropic of Capricorn it will be in the North in the middle of the day
+    (somewhere around 0 jadians).  In the Tropics it may be in the North or the
+    South in the middle of the day, depending on the time of year.
+  */
+  azimuth_radians /float
+
+  noaa_adjusted_elevation /bool
+
+  /**
+  The compass source of the Sun's rays.  This will be in the West (somewhere
+    around 270 degrees) in the morning, and in the East (somewhere around 90
+    degrees) in the evening.  North of the Tropic of Cancer it will be in the
+    South in the middle of the day (somewhere around 180 degrees), while South of
+    the Tropic of Capricorn it will be in the North in the middle of the day
+    (somewhere around 0 degrees).  In the Tropics it may be in the North or the
+    South in the middle of the day, depending on the time of year.
+  */
+  azimuth_degrees -> float:
+    return radians_to_degrees_ azimuth_radians
+
+  /**
+  Is the Sun below the minimum elevation for astronomical dusk/dawn.
+  */
+  astronomical_night -> bool:
+    return elevation_degrees < ASTRONOMICAL
+
+  /**
+  Is the Sun below the minimum elevation for nautical dusk/dawn.
+  */
+  nautical_night -> bool:
+    return elevation_degrees < NAUTICAL
+
+  /**
+  Is the Sun below the minimum elevation for civil dusk/dawn.
+  */
+  civil_night -> bool:
+    return elevation_degrees < CIVIL
+
+  /**
+  Return true if the elevation of the Sun is under the horizon.
+  If this object was generated using the NOAA model to adjust the
+    apparent elevation of the Sun then this method returns whether
+    the apparent elevation is less than 0 degrees.
+  If this object was generated without taking the refraction of
+    the atmosphere into account then a standard refraction correction
+    of 0.833 degrees is used here to determine whether it is night.
+  */
+  night -> bool:
+    if noaa_adjusted_elevation:
+      return elevation_radians < 0.0
+    else:
+      return elevation_degrees < -0.833
+
+  constructor .azimuth_radians/float .elevation_radians/float --noaa_elevation_correction/bool:
+    noaa_adjusted_elevation = noaa_elevation_correction
+
 SIN_AXIAL_TILT_ ::= sin
   23.44 / 180.0 * PI
 NANOSECONDS_PER_DAY_ ::= Duration.NANOSECONDS_PER_HOUR * 24.0
@@ -89,7 +169,6 @@ The provided block is called with the transit time for the given
 */
 declination noon/Time --time/Time=noon --longitude/num [block]-> float:
   fractional_days := days_since_2000 time
-  fractional_days -= longitude / 360.0
   // M = mean anomaly.
   mean_anomaly := degrees_to_radians_
     (357.5291 + 0.9856474 * fractional_days) % 360.0
@@ -134,7 +213,7 @@ declination noon/Time --time/Time=noon --longitude/num [block]-> float:
 
   // lambda = L + C
   ecliptic_longitude := degrees_to_radians_
-    mean_longitude_deg + equation_of_the_center_deg 
+    mean_longitude_deg + equation_of_the_center_deg
 
   utc := noon.utc
   transit_basis := Time.utc --year=utc.year --month=utc.month --day=utc.day --h=12
@@ -212,7 +291,7 @@ ASTRONOMICAL := -18.0
 /**
 Variant of $sunrise_sunset that takes a date as three ints.
 */
-sunrise_sunset year/int month/int day/int longitude/float latitude/float type/num=0.0 --noaa_elevation_correction=false -> Transitions:
+sunrise_sunset year/int month/int day/int longitude/num latitude/num type/num=0.0 --noaa_elevation_correction=false -> Transitions:
   time := Time.utc year month day 12
   return sunrise_sunset time --time=time longitude latitude type --noaa_elevation_correction=noaa_elevation_correction
 
@@ -240,13 +319,13 @@ In practice the refraction depends on the weather, so it is merely an
   approximation.  No correction is applied by default for civil, nautical,
   and astronomical dusk.
 */
-sunrise_sunset noon/Time --time/Time=noon longitude/float latitude/float type/num=0.0 --noaa_elevation_correction=false -> Transitions:
+sunrise_sunset noon/Time --time/Time=noon longitude/num latitude/num type/num=0.0 --noaa_elevation_correction=false -> Transitions:
   transit := null
   decl := declination noon --time=time --longitude=longitude: | tr |
     transit = tr
   latitude_rad := degrees_to_radians_ latitude
-  sinsin := (sin latitude_rad) * (sin decl)
-  coscos := (cos latitude_rad) * (cos decl)
+  sin_sin := (sin latitude_rad) * (sin decl)
+  cos_cos := (cos latitude_rad) * (cos decl)
   // subhorizon_angle is thus always negative, and in radians.
   correction/float := ?
   if noaa_elevation_correction:
@@ -254,7 +333,7 @@ sunrise_sunset noon/Time --time/Time=noon longitude/float latitude/float type/nu
   else:
     correction = type == 0 ? (degrees_to_radians_ 0.833) : 0.0
   subhorizon_angle ::= (degrees_to_radians_ type) - correction
-  acos_input := ((sin subhorizon_angle) - sinsin) / coscos
+  acos_input := ((sin subhorizon_angle) - sin_sin) / cos_cos
   if acos_input < -1.0: return Transitions.light
   else if acos_input > 1.0: return Transitions.dark
   else if acos_input.is_nan: return Transitions.light
@@ -263,3 +342,50 @@ sunrise_sunset noon/Time --time/Time=noon longitude/float latitude/float type/nu
   sunrise := transit - half_duration
   sunset := transit + half_duration
   return Transitions sunrise sunset
+
+/**
+The position of the sun at a given time and place.
+The elevation is not corrected for the refraction of the atmosphere near the
+  horizon.  If this is desired set $noaa_elevation_correction to be true.
+*/
+solar_position time/Time longitude/num latitude/num --noaa_elevation_correction=false -> SolarPosition:
+  hour_angle := 0.0
+  decl := declination time --longitude=longitude: | transit |
+    difference := transit.to time
+    // The Earth rotates one degree each 240 seconds.
+    hour_angle = difference.in_ms / 240_000.0
+
+  if hour_angle < -180: hour_angle += 360
+  if hour_angle > 180: hour_angle -= 360
+
+  hour_angle = degrees_to_radians_ hour_angle
+
+  latitude_rad := degrees_to_radians_ latitude
+  sin_decl := sin decl
+  cos_decl := cos decl
+  sin_latitude := sin latitude_rad
+  cos_latitude := cos latitude_rad
+  cos_hour_angle := cos hour_angle
+
+  sin_sin := sin_latitude * sin_decl
+  cos_cos_cos := cos_decl * cos_latitude * cos_hour_angle
+
+  asin_input := sin_sin + cos_cos_cos
+
+  elevation := asin asin_input
+
+  sin_cos := sin_decl * cos_latitude
+  cos_cos_sin := cos_hour_angle * cos_decl * sin_latitude
+
+  acos_input := (sin_cos - cos_cos_sin) / (cos elevation)
+
+  azimuth /float := ?
+
+  azimuth = (-1.0 <= acos_input <= 1.0) ? (acos acos_input) : 0.0
+  if hour_angle > 0:
+    azimuth = 2 * PI - azimuth
+
+  if noaa_elevation_correction:
+    elevation += elevation_correction elevation
+
+  return SolarPosition azimuth elevation --noaa_elevation_correction=noaa_elevation_correction
