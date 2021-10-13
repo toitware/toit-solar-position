@@ -121,8 +121,8 @@ random_values:
     lat := (random 181) - 90.0
     long := random 360
     position := solar_position time long lat
-    expect (not position.azimuth_degrees.is_nan)
-    expect (not position.elevation_degrees.is_nan)
+    expect_not position.azimuth_degrees.is_nan
+    expect_not position.elevation_degrees.is_nan
     // Above the Tropic of Cancer the sun never rises above
     // an angle that depends on the Latitude.
     if lat > 23.5:

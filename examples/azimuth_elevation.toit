@@ -38,11 +38,10 @@ main:
 
 curve place long lat y m d:
   ss := sunrise_sunset y m d long lat
-  date := "$y-$(%02d m)-$(%02d d)"
   print "Sunrise $ss.sunrise"
   print "Sunset  $ss.sunset"
   for i := 1; i <= 23; i++:
-    time := Time.from_string "$(date)T$(%02d i):00:00Z"
+    time := Time.utc --year=y --month=m --day=d --h=i
     position := solar_position time long lat
-    print "$place $date $(%02d i):00 $position.elevation_degrees $position.azimuth_degrees"
+    print "$place $time.utc $position.elevation_degrees $position.azimuth_degrees"
   print ""

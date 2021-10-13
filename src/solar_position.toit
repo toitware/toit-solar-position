@@ -43,31 +43,31 @@ class Transitions:
     return "Sunrise: $sunrise, Sunset: $sunset"
 
 /**
-Describes the position of the Sun in the sky.
+The position of the Sun in the sky.
 */
 class SolarPosition:
   /**
-  The angle between the Sun's rays and the horizontal.  This will be around
-    zero at sunrise and sunset, and will be at its highest around noon.
+  The angle between the Sun's rays and the horizontal.  This is around
+    zero at sunrise and sunset, and is at its highest around noon.
   The value will always be between 0 and PI/2 radians.
   */
   elevation_radians /float
 
   /**
-  The angle between the Sun's rays and the horizontal.  This will be around
-    zero at sunrise and sunset, and will be at its highest around noon.
+  The angle between the Sun's rays and the horizontal.  This is around
+    zero at sunrise and sunset, and is at its highest around noon.
   The value will always be between 0 and 90 degrees.
   */
   elevation_degrees -> float:
     return radians_to_degrees_ elevation_radians
 
   /**
-  The compass source of the Sun's rays.  This will be in the West (somewhere
+  The compass source of the Sun's rays.  This is in the West (somewhere
     around 3/2 PI radians) in the morning, and in the East (somewhere around PI/2
-    radians) in the evening.  North of the Tropic of Cancer it will be in the
+    radians) in the evening.  North of the Tropic of Cancer it is in the
     South in the middle of the day (somewhere around PI radians), while South of
-    the Tropic of Capricorn it will be in the North in the middle of the day
-    (somewhere around 0 jadians).  In the Tropics it may be in the North or the
+    the Tropic of Capricorn it is in the North in the middle of the day
+    (somewhere around 0 radians).  In the Tropics it may be in the North or the
     South in the middle of the day, depending on the time of year.
   */
   azimuth_radians /float
@@ -75,11 +75,11 @@ class SolarPosition:
   noaa_adjusted_elevation /bool
 
   /**
-  The compass source of the Sun's rays.  This will be in the West (somewhere
+  The compass source of the Sun's rays.  This is in the West (somewhere
     around 270 degrees) in the morning, and in the East (somewhere around 90
-    degrees) in the evening.  North of the Tropic of Cancer it will be in the
+    degrees) in the evening.  North of the Tropic of Cancer it is in the
     South in the middle of the day (somewhere around 180 degrees), while South of
-    the Tropic of Capricorn it will be in the North in the middle of the day
+    the Tropic of Capricorn it is in the North in the middle of the day
     (somewhere around 0 degrees).  In the Tropics it may be in the North or the
     South in the middle of the day, depending on the time of year.
   */
@@ -87,19 +87,19 @@ class SolarPosition:
     return radians_to_degrees_ azimuth_radians
 
   /**
-  Is the Sun below the minimum elevation for astronomical dusk/dawn.
+  Whether the Sun is below the minimum elevation for astronomical dusk/dawn.
   */
   astronomical_night -> bool:
     return elevation_degrees < ASTRONOMICAL
 
   /**
-  Is the Sun below the minimum elevation for nautical dusk/dawn.
+  Whether the Sun is below the minimum elevation for nautical dusk/dawn.
   */
   nautical_night -> bool:
     return elevation_degrees < NAUTICAL
 
   /**
-  Is the Sun below the minimum elevation for civil dusk/dawn.
+  Whether Sun is below the minimum elevation for civil dusk/dawn.
   */
   civil_night -> bool:
     return elevation_degrees < CIVIL
@@ -309,7 +309,7 @@ The sunset doesn't happen until the Sun is physically below the horizon.  How
   Default is the simple sunrise/sunset where the center of the Sun aligns
   with the horizon.
 On a day and location where the Sun does not rise or set, both of the
-  times will be null.
+  times are null.
 The calculation compensates for the refraction caused by the curvature of the
   atmosphere relative to the Sun's rays.  By default it considers the Sun to
   have set when it is actually 0.833 degrees under the horizon.  Use
