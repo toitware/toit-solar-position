@@ -105,7 +105,7 @@ class SolarPosition:
     return elevation_degrees < CIVIL
 
   /**
-  Return true if the elevation of the Sun is under the horizon.
+  Whether the elevation of the Sun is under the horizon.
   If this object was generated using the NOAA model to adjust the
     apparent elevation of the Sun then this method returns whether
     the apparent elevation is less than 0 degrees.
@@ -291,7 +291,7 @@ ASTRONOMICAL := -18.0
 /**
 Variant of $sunrise_sunset that takes a date as three ints.
 */
-sunrise_sunset year/int month/int day/int longitude/num latitude/num type/num=0.0 --noaa_elevation_correction=false -> Transitions:
+sunrise_sunset year/int month/int day/int longitude/num latitude/num type/num=0.0 --noaa_elevation_correction/bool=false -> Transitions:
   time := Time.utc year month day 12
   return sunrise_sunset time --time=time longitude latitude type --noaa_elevation_correction=noaa_elevation_correction
 
@@ -319,7 +319,7 @@ In practice the refraction depends on the weather, so it is merely an
   approximation.  No correction is applied by default for civil, nautical,
   and astronomical dusk.
 */
-sunrise_sunset noon/Time --time/Time=noon longitude/num latitude/num type/num=0.0 --noaa_elevation_correction=false -> Transitions:
+sunrise_sunset noon/Time --time/Time=noon longitude/num latitude/num type/num=0.0 --noaa_elevation_correction/bool=false -> Transitions:
   transit := null
   decl := declination noon --time=time --longitude=longitude: | tr |
     transit = tr
@@ -348,7 +348,7 @@ The position of the sun at a given time and place.
 The elevation is not corrected for the refraction of the atmosphere near the
   horizon.  If this is desired set $noaa_elevation_correction to be true.
 */
-solar_position time/Time longitude/num latitude/num --noaa_elevation_correction=false -> SolarPosition:
+solar_position time/Time longitude/num latitude/num --noaa_elevation_correction/bool=false -> SolarPosition:
   hour_angle := 0.0
   decl := declination time --longitude=longitude: | transit |
     difference := transit.to time
