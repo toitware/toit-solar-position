@@ -285,7 +285,7 @@ check_declination:
   }
 
   for y := 2001; y < 2070; y += 10:
-    t := Time.from_string "$y-04-30T12:00:00Z"
+    t := Time.from_string "$(y)-04-30T12:00:00Z"
     decl := declination t
     decl = radians_to_degrees decl
     decl %= 360.0
