@@ -1,6 +1,6 @@
 // Copyright (C) 2021 Toitware ApS.
 // Use of this source code is governed by a Zero-Clause BSD license that can
-// be found in the EXAMPLES_LICENSE file.
+// be found in the TESTS_LICENSE file.
 
 import expect show *
 
@@ -30,28 +30,28 @@ main:
 
 known_values:
   check
-    Time.from_string "2021-10-11T08:00:00Z"
+    Time.parse "2021-10-11T08:00:00Z"
     TRANBJERG_LONGITUDE
     TRANBJERG_LATITUDE
     131.43
     16.17
 
   check
-    Time.from_string "2000-01-01T12:00:00Z"
+    Time.parse "2000-01-01T12:00:00Z"
     TRANBJERG_LONGITUDE
     TRANBJERG_LATITUDE
     188.71
     10.57
 
   check
-    Time.from_string "2000-01-01T12:00:00Z"
+    Time.parse "2000-01-01T12:00:00Z"
     TROLL_STN_LONGITUDE
     TROLL_STN_LATITUDE
     357.92
     41.03
 
   check
-    Time.from_string "2024-06-01T16:10:15Z"
+    Time.parse "2024-06-01T16:10:15Z"
     THE_DUNE_LONGITUDE
     THE_DUNE_LATITUDE
     0.62
@@ -59,35 +59,35 @@ known_values:
 
   // 30 seconds later the angle is almost two degrees less.
   check
-    Time.from_string "2024-06-01T16:10:45Z"
+    Time.parse "2024-06-01T16:10:45Z"
     THE_DUNE_LONGITUDE
     THE_DUNE_LATITUDE
     358.97
     85.99
 
   check
-    Time.from_string "2024-06-01T08:30:45Z"
+    Time.parse "2024-06-01T08:30:45Z"
     THE_DUNE_LONGITUDE
     THE_DUNE_LATITUDE
     60.27
     -14.64
 
   check
-    Time.from_string "2024-06-01T09:00:00Z"
+    Time.parse "2024-06-01T09:00:00Z"
     THE_DUNE_LONGITUDE
     THE_DUNE_LATITUDE
     63.23
     -8.5
 
   check
-    Time.from_string "2024-06-01T09:00:00Z"
+    Time.parse "2024-06-01T09:00:00Z"
     THE_DUNE_LONGITUDE
     THE_DUNE_LATITUDE
     63.23
     -8.5
 
   check
-    Time.from_string "2024-06-01T00:05:00Z"
+    Time.parse "2024-06-01T00:05:00Z"
     RAPA_NUI_LONGITUDE
     RAPA_NUI_LATITUDE
     297.63
@@ -117,7 +117,7 @@ random_values:
     hour := random 24
     minute := random 60
     second := random 60
-    time := Time.from_string "$(year)-$(%02d month)-$(%02d day)T$(%02d hour):$(%02d minute):$(%02d second)Z"
+    time := Time.parse "$(year)-$(%02d month)-$(%02d day)T$(%02d hour):$(%02d minute):$(%02d second)Z"
     lat := (random 181) - 90.0
     long := random 360
     position := solar_position time long lat
