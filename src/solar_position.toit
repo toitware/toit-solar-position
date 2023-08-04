@@ -129,7 +129,7 @@ LEAPSECOND_ADJUSTMENT_ ::= 0.0008  // In days.
 TWO_PI_RECIPROCAL_ ::= 1.0 / (2.0 * PI)
 
 /// The basis of the J2000 epoch as a $Time instance.
-NOON_2000 ::= Time.from_string "2000-01-01T12:00:00Z"
+NOON_2000 ::= Time.parse "2000-01-01T12:00:00Z"
 
 /**
 Julian day number - the number of days including fractional part

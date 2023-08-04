@@ -1,6 +1,6 @@
 // Copyright (C) 2021 Toitware ApS.  All rights reserved.
-// Use of this source code is governed by an MIT-style license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by a Zero-Clause BSD license that can
+// be found in the TESTS_LICENSE file.
 
 import expect show *
 import math
@@ -27,7 +27,7 @@ TRANBJERG_LONGITUDE ::= 10.1337
 TRANBJERG_LATITUDE ::= 56.09
 
 aarhus_2021:
-  oct_8 ::= Time.from_string "2021-10-08T12:00:00Z"
+  oct_8 ::= Time.parse "2021-10-08T12:00:00Z"
   geome := sunrise_sunset oct_8 AARHUS_LONGITUDE AARHUS_LATITUDE GEOMETRIC
   civil := sunrise_sunset oct_8 AARHUS_LONGITUDE AARHUS_LATITUDE CIVIL
   nauti := sunrise_sunset oct_8 AARHUS_LONGITUDE AARHUS_LATITUDE NAUTICAL
@@ -44,14 +44,14 @@ aarhus_2021:
 
   ERROR := Duration --s=85
   // Expected times from Wolfram Alpha.
-  astro_rise := Time.from_string "2021-10-08T03:31:00Z"
-  nauti_rise := Time.from_string "2021-10-08T04:15:00Z"
-  civil_rise := Time.from_string "2021-10-08T04:59:00Z"
-  geome_rise := Time.from_string "2021-10-08T05:36:00Z"
-  geome_set  := Time.from_string "2021-10-08T16:35:00Z"
-  civil_set  := Time.from_string "2021-10-08T17:12:00Z"
-  nauti_set  := Time.from_string "2021-10-08T17:56:00Z"
-  astro_set  := Time.from_string "2021-10-08T18:40:00Z"
+  astro_rise := Time.parse "2021-10-08T03:31:00Z"
+  nauti_rise := Time.parse "2021-10-08T04:15:00Z"
+  civil_rise := Time.parse "2021-10-08T04:59:00Z"
+  geome_rise := Time.parse "2021-10-08T05:36:00Z"
+  geome_set  := Time.parse "2021-10-08T16:35:00Z"
+  civil_set  := Time.parse "2021-10-08T17:12:00Z"
+  nauti_set  := Time.parse "2021-10-08T17:56:00Z"
+  astro_set  := Time.parse "2021-10-08T18:40:00Z"
   expect astro_rise - ERROR < astro.sunrise < astro_rise + ERROR
   expect nauti_rise - ERROR < nauti.sunrise < nauti_rise + ERROR
   expect civil_rise - ERROR < civil.sunrise < civil_rise + ERROR
@@ -65,21 +65,21 @@ BERLIN_LONGITUDE ::= 13.4123026
 BERLIN_LATITUDE  ::= 52.5189418
 
 berlin_2021:
-  oct_8 ::= Time.from_string "2021-10-08T12:00:00Z"
+  oct_8 ::= Time.parse "2021-10-08T12:00:00Z"
   geome := sunrise_sunset oct_8 BERLIN_LONGITUDE BERLIN_LATITUDE GEOMETRIC
 
   print "sunset (Berlin)               $geome.sunset.local"
 
   ERROR := Duration --s=85
   // Expected times from the net.
-  geome_set  := Time.from_string "2021-10-08T16:27:00Z"
+  geome_set  := Time.parse "2021-10-08T16:27:00Z"
   expect geome_set  - ERROR < geome.sunset < geome_set  + ERROR
 
 HONOLULU_LONGITUDE ::= -157.8583
 HONOLULU_LATITUDE  ::= 21.3069
 
 honolulu_2021:
-  oct_8 ::= Time.from_string "2021-10-08T12:00:00Z"
+  oct_8 ::= Time.parse "2021-10-08T12:00:00Z"
   geome := sunrise_sunset oct_8 HONOLULU_LONGITUDE HONOLULU_LATITUDE GEOMETRIC
 
   print "sunrise (Honolulu)             $geome.sunrise"
@@ -87,8 +87,8 @@ honolulu_2021:
 
   ERROR := Duration --s=85
   // Expected times from the TimeAndData.com.
-  geome_rise := Time.from_string "2021-10-08T16:24:00Z"  // 6:24 local time.
-  geome_set  := Time.from_string "2021-10-09T04:12:00Z"  // 18:12 local time.
+  geome_rise := Time.parse "2021-10-08T16:24:00Z"  // 6:24 local time.
+  geome_set  := Time.parse "2021-10-09T04:12:00Z"  // 18:12 local time.
   expect geome_rise - ERROR < geome.sunrise < geome_rise + ERROR
   expect geome_set  - ERROR < geome.sunset < geome_set  + ERROR
 
@@ -96,7 +96,7 @@ AUCKLAND_LONGITUDE ::= 174.7645
 AUCKLAND_LATITUDE  ::= -36.8509
 
 auckland_2021:
-  oct_8 ::= Time.from_string "2021-10-08T12:00:00Z"
+  oct_8 ::= Time.parse "2021-10-08T12:00:00Z"
   geome := sunrise_sunset oct_8 AUCKLAND_LONGITUDE AUCKLAND_LATITUDE GEOMETRIC
 
   print "sunrise (Auckland)            $geome.sunrise"
@@ -104,8 +104,8 @@ auckland_2021:
 
   ERROR := Duration --s=85
   // Expected times from TimeAndDate.com
-  geome_rise := Time.from_string "2021-10-07T17:45:00Z"  // 6:45 local time, Auckland is GMT+13.
-  geome_set  := Time.from_string "2021-10-08T06:31:00Z"  // 19:31 local time, Auckland is GMT+13.
+  geome_rise := Time.parse "2021-10-07T17:45:00Z"  // 6:45 local time, Auckland is GMT+13.
+  geome_set  := Time.parse "2021-10-08T06:31:00Z"  // 19:31 local time, Auckland is GMT+13.
   expect geome_rise - ERROR < geome.sunrise < geome_rise + ERROR
   expect geome_set  - ERROR < geome.sunset < geome_set  + ERROR
 
@@ -116,10 +116,10 @@ arctic_summer_2021:
   // We disagree with TimeAndDate.com on whether the sun rose on May 12 and July 31.
   // Given that the sun is skimming along parallel to the horizon all night
   // this is not too worrying.
-  may_11 ::= Time.from_string "2021-05-11T12:00:00Z"  // 2nd-last day with a sunset according to TimeAndDate.com.
-  may_13 ::= Time.from_string "2021-05-13T12:00:00Z"  // First day with no night.
-  jul_30 ::= Time.from_string "2021-07-30T12:00:00Z"  // 2nd-last day with no night according to TimeAndDate.com.
-  aug_1 ::= Time.from_string "2021-08-01T12:00:00Z"   // First day with a sunrise according to TimeAndDate.com.
+  may_11 ::= Time.parse "2021-05-11T12:00:00Z"  // 2nd-last day with a sunset according to TimeAndDate.com.
+  may_13 ::= Time.parse "2021-05-13T12:00:00Z"  // First day with no night.
+  jul_30 ::= Time.parse "2021-07-30T12:00:00Z"  // 2nd-last day with no night according to TimeAndDate.com.
+  aug_1 ::= Time.parse "2021-08-01T12:00:00Z"   // First day with a sunrise according to TimeAndDate.com.
 
   spring          := sunrise_sunset may_11 JAN_MAYEN_LONGITUDE JAN_MAYEN_LATITUDE GEOMETRIC
   no_night_spring := sunrise_sunset may_13 JAN_MAYEN_LONGITUDE JAN_MAYEN_LATITUDE GEOMETRIC
@@ -140,18 +140,18 @@ arctic_summer_2021:
 
   ERROR := Duration --s=1080  // 18 minute errors when the sun is almost horizontal!
   // Expected times from TimeAndDate.com
-  spring_rise := Time.from_string "2021-05-11T01:10:00Z"  // 3:30 local time
-  spring_set  := Time.from_string "2021-05-11T23:45:00Z"  // 1:48 local time, next day.
+  spring_rise := Time.parse "2021-05-11T01:10:00Z"  // 3:30 local time
+  spring_set  := Time.parse "2021-05-11T23:45:00Z"  // 1:48 local time, next day.
   expect spring_rise - ERROR < spring.sunrise < spring_rise + ERROR
   expect spring_set  - ERROR < spring.sunset < spring_set  + ERROR
-  autumn_rise := Time.from_string "2021-08-01T01:30:00Z"  // 3:30 local time
-  autumn_set  := Time.from_string "2021-08-01T23:48:00Z"  // 1:48 local time, next day.
+  autumn_rise := Time.parse "2021-08-01T01:30:00Z"  // 3:30 local time
+  autumn_set  := Time.parse "2021-08-01T23:48:00Z"  // 1:48 local time, next day.
   expect autumn_rise - ERROR < autumn.sunrise < autumn_rise + ERROR
   expect autumn_set  - ERROR < autumn.sunset < autumn_set  + ERROR
 
 arctic_spring_2021:
-  fool ::= Time.from_string      "2021-04-01T12:00:00Z"  // April fool's day
-  halloween ::= Time.from_string "2021-10-31T12:00:00Z"
+  fool ::= Time.parse      "2021-04-01T12:00:00Z"  // April fool's day
+  halloween ::= Time.parse "2021-10-31T12:00:00Z"
   print_times fool JAN_MAYEN_LONGITUDE JAN_MAYEN_LATITUDE GEOMETRIC "Geometric"
   print_times halloween JAN_MAYEN_LONGITUDE JAN_MAYEN_LATITUDE GEOMETRIC "Geometric"
 
@@ -170,19 +170,19 @@ arctic_spring_2021:
 
   ERROR := Duration --s=85
   // Expected times from TimeAndDate.com
-  fool_rise := Time.from_string "2021-04-01T05:31:00Z"  // 7:31 local time
-  fool_set  := Time.from_string "2021-04-01T19:43:00Z"  // 21:43 local time
+  fool_rise := Time.parse "2021-04-01T05:31:00Z"  // 7:31 local time
+  fool_set  := Time.parse "2021-04-01T19:43:00Z"  // 21:43 local time
   expect fool_rise - ERROR < fool_sun.sunrise < fool_rise + ERROR
   expect fool_set  - ERROR < fool_sun.sunset < fool_set  + ERROR
   // Expected times from TimeAndDate.com
   ERROR = Duration --s=180  // 3 minute errors at Halloween..
-  spooky_rise := Time.from_string "2021-10-31T09:10:00Z"  // 10:10 local time
-  spooky_set  := Time.from_string "2021-10-31T15:20:00Z"  // 16:20 local time
+  spooky_rise := Time.parse "2021-10-31T09:10:00Z"  // 10:10 local time
+  spooky_set  := Time.parse "2021-10-31T15:20:00Z"  // 16:20 local time
   expect spooky_rise - ERROR < spooky_sun.sunrise < spooky_rise + ERROR
   expect spooky_set  - ERROR < spooky_sun.sunset < spooky_set  + ERROR
 
 arctic_winter_2021:
-  jan_1 ::= Time.from_string "2021-01-01T12:00:00Z"
+  jan_1 ::= Time.parse "2021-01-01T12:00:00Z"
 
   silvester_sun := sunrise_sunset jan_1 JAN_MAYEN_LONGITUDE JAN_MAYEN_LATITUDE GEOMETRIC
   expect silvester_sun.always_dark
@@ -200,8 +200,8 @@ TROLL_STATION_LATITUDE ::= -72.011667  // 72 00' 42'' S
 TROLL_STATION_LONGITUDE ::= 2.53472    //  2 32' 05'' E
 
 antarctic_conditions_2021:
-  jan_1 ::= Time.from_string "2021-01-01T12:00:00Z"
-  feb_1 ::= Time.from_string "2021-02-01T12:00:00Z"
+  jan_1 ::= Time.parse "2021-01-01T12:00:00Z"
+  feb_1 ::= Time.parse "2021-02-01T12:00:00Z"
 
   silvester_sun := sunrise_sunset jan_1 TROLL_STATION_LONGITUDE TROLL_STATION_LATITUDE GEOMETRIC
   expect silvester_sun.always_light
@@ -218,16 +218,16 @@ antarctic_conditions_2021:
   // No stargazing at Troll Station in February.
   expect feb_astro.always_light
 
-  jul_1 ::= Time.from_string "2021-07-01T12:00:00Z"
+  jul_1 ::= Time.parse "2021-07-01T12:00:00Z"
 
   july_sun := sunrise_sunset jul_1 TROLL_STATION_LONGITUDE TROLL_STATION_LATITUDE GEOMETRIC
   expect july_sun.always_dark
 
 poles_2021:
-  fool ::= Time.from_string      "2021-04-01T12:00:00Z"  // April fool's day
-  halloween ::= Time.from_string "2021-10-31T12:00:00Z"
-  march_equinox := Time.from_string "2021-03-21T12:00:00Z"  // March equinox.
-  september_equinox := Time.from_string "2021-09-21T12:00:00Z"  // September equinox.
+  fool ::= Time.parse      "2021-04-01T12:00:00Z"  // April fool's day
+  halloween ::= Time.parse "2021-10-31T12:00:00Z"
+  march_equinox := Time.parse "2021-03-21T12:00:00Z"  // March equinox.
+  september_equinox := Time.parse "2021-09-21T12:00:00Z"  // September equinox.
 
   NORTH_POLE := 90.0
   SOUTH_POLE := -90.0
@@ -285,7 +285,7 @@ check_declination:
   }
 
   for y := 2001; y < 2070; y += 10:
-    t := Time.from_string "$(y)-04-30T12:00:00Z"
+    t := Time.parse "$(y)-04-30T12:00:00Z"
     decl := declination t
     decl = radians_to_degrees decl
     decl %= 360.0
@@ -300,21 +300,21 @@ degrees_to_radians degrees/num -> float:
 main2:
   expect_equals
     0.0
-    days_since_2000 (Time.from_string "2000-01-01T12:00:00Z")
+    days_since_2000 (Time.parse "2000-01-01T12:00:00Z")
   expect_equals
     1.0
-    days_since_2000 (Time.from_string "2000-01-02T12:00:00Z")
+    days_since_2000 (Time.parse "2000-01-02T12:00:00Z")
   expect_equals
     -1.0
-    days_since_2000 (Time.from_string "1999-12-31T12:00:00Z")
+    days_since_2000 (Time.parse "1999-12-31T12:00:00Z")
   expect_equals
     0.5
-    days_since_2000 (Time.from_string "2000-01-02T00:00:00Z")
+    days_since_2000 (Time.parse "2000-01-02T00:00:00Z")
   expect_equals
     365.5  // Leap year.
-    days_since_2000 (Time.from_string "2001-01-01T00:00:00Z")
+    days_since_2000 (Time.parse "2001-01-01T00:00:00Z")
 
-  end_of_april := Time.from_string "2021-04-30T03:48:00Z"
+  end_of_april := Time.parse "2021-04-30T03:48:00Z"
   expect_equals
     7790.0 - 9.0 / 24 + 48.0 / (24 * 60)
     days_since_2000 end_of_april
@@ -329,7 +329,7 @@ main2:
   // https://gml.noaa.gov/grad/solcalc/ says 14.8 degrees.
   expect 14.75 <= accurate < 14.85
 
-  start_of_october := Time.from_string "2049-10-01T14:41:49Z"
+  start_of_october := Time.parse "2049-10-01T14:41:49Z"
   october_declination := radians_to_degrees
       declination start_of_october
 
@@ -337,7 +337,7 @@ main2:
   // https://gml.noaa.gov/grad/solcalc/ says -3.51 degrees.
   expect -3.515 <= october_declination < -3.505
 
-  birthday := Time.from_string "1969-05-27T12:55:00Z"
+  birthday := Time.parse "1969-05-27T12:55:00Z"
   birthday_declination := radians_to_degrees
       declination birthday
 
@@ -373,7 +373,7 @@ main2:
   print "-89.9: $(%0.3f radians_to_degrees (elevation_correction (degrees_to_radians -89.9)))"
   print "-90.0: $(%0.3f radians_to_degrees (elevation_correction (degrees_to_radians -90.0)))"
 
-  noon := Time.from_string "2021-04-30T12:00:00Z"
+  noon := Time.parse "2021-04-30T12:00:00Z"
   print_times noon TRANBJERG_LONGITUDE TRANBJERG_LATITUDE GEOMETRIC     "   Geometric"
   print_times noon TRANBJERG_LONGITUDE TRANBJERG_LATITUDE CIVIL         "       Civil"
   print_times noon TRANBJERG_LONGITUDE TRANBJERG_LATITUDE NAUTICAL      "    Nautical"
