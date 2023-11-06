@@ -1,4 +1,5 @@
 # Toit Package.
 name: solar_position
+description: Package to calculate the sunrise and sunset times for a given place and time on Earth.
 environment:
   sdk: ^2.0.0-alpha.92
