@@ -30,16 +30,16 @@ class Transitions:
   dark_ /bool?
 
   /// Whether the Sun is below the horizon the entire day.
-  always_dark -> bool:
+  always-dark -> bool:
     return not sunrise and dark_
 
   /// Is the Sun above the horizon the entire day.
-  always_light -> bool:
+  always-light -> bool:
     return not sunset and not dark_
 
   stringify -> string:
-    if always_light: return "Always light"
-    if always_dark: return "Always dark"
+    if always-light: return "Always light"
+    if always-dark: return "Always dark"
     return "Sunrise: $sunrise, Sunset: $sunset"
 
 /**
@@ -51,15 +51,15 @@ class SolarPosition:
     zero at sunrise and sunset, and is at its highest around noon.
   The value will always be between 0 and PI/2 radians.
   */
-  elevation_radians /float
+  elevation-radians /float
 
   /**
   The angle between the Sun's rays and the horizontal.  This is around
     zero at sunrise and sunset, and is at its highest around noon.
   The value will always be between 0 and 90 degrees.
   */
-  elevation_degrees -> float:
-    return radians_to_degrees_ elevation_radians
+  elevation-degrees -> float:
+    return radians-to-degrees_ elevation-radians
 
   /**
   The compass source of the Sun's rays.  This is in the West (somewhere
@@ -70,9 +70,9 @@ class SolarPosition:
     (somewhere around 0 radians).  In the Tropics it may be in the North or the
     South in the middle of the day, depending on the time of year.
   */
-  azimuth_radians /float
+  azimuth-radians /float
 
-  noaa_adjusted_elevation /bool
+  noaa-adjusted-elevation /bool
 
   /**
   The compass source of the Sun's rays.  This is in the West (somewhere
@@ -83,26 +83,26 @@ class SolarPosition:
     (somewhere around 0 degrees).  In the Tropics it may be in the North or the
     South in the middle of the day, depending on the time of year.
   */
-  azimuth_degrees -> float:
-    return radians_to_degrees_ azimuth_radians
+  azimuth-degrees -> float:
+    return radians-to-degrees_ azimuth-radians
 
   /**
   Whether the Sun is below the minimum elevation for astronomical dusk/dawn.
   */
-  astronomical_night -> bool:
-    return elevation_degrees < ASTRONOMICAL
+  astronomical-night -> bool:
+    return elevation-degrees < ASTRONOMICAL
 
   /**
   Whether the Sun is below the minimum elevation for nautical dusk/dawn.
   */
-  nautical_night -> bool:
-    return elevation_degrees < NAUTICAL
+  nautical-night -> bool:
+    return elevation-degrees < NAUTICAL
 
   /**
   Whether Sun is below the minimum elevation for civil dusk/dawn.
   */
-  civil_night -> bool:
-    return elevation_degrees < CIVIL
+  civil-night -> bool:
+    return elevation-degrees < CIVIL
 
   /**
   Whether the elevation of the Sun is under the horizon.
@@ -114,45 +114,45 @@ class SolarPosition:
     of 0.833 degrees is used here to determine whether it is night.
   */
   night -> bool:
-    if noaa_adjusted_elevation:
-      return elevation_radians < 0.0
+    if noaa-adjusted-elevation:
+      return elevation-radians < 0.0
     else:
-      return elevation_degrees < -0.833
+      return elevation-degrees < -0.833
 
-  constructor .azimuth_radians/float .elevation_radians/float --noaa_elevation_correction/bool:
-    noaa_adjusted_elevation = noaa_elevation_correction
+  constructor .azimuth-radians/float .elevation-radians/float --noaa-elevation-correction/bool:
+    noaa-adjusted-elevation = noaa-elevation-correction
 
-SIN_AXIAL_TILT_ ::= sin
+SIN-AXIAL-TILT_ ::= sin
   23.44 / 180.0 * PI
-NANOSECONDS_PER_DAY_ ::= Duration.NANOSECONDS_PER_HOUR * 24.0
-LEAPSECOND_ADJUSTMENT_ ::= 0.0008  // In days.
-TWO_PI_RECIPROCAL_ ::= 1.0 / (2.0 * PI)
+NANOSECONDS-PER-DAY_ ::= Duration.NANOSECONDS-PER-HOUR * 24.0
+LEAPSECOND-ADJUSTMENT_ ::= 0.0008  // In days.
+TWO-PI-RECIPROCAL_ ::= 1.0 / (2.0 * PI)
 
 /// The basis of the J2000 epoch as a $Time instance.
-NOON_2000 ::= Time.parse "2000-01-01T12:00:00Z"
+NOON-2000 ::= Time.parse "2000-01-01T12:00:00Z"
 
 /**
 Julian day number - the number of days including fractional part
   since noon UTC on January 1, 4713 BC.
 */
-julian_day time/Time -> float:
-  ns := time.ns_since_epoch
-  days := time.ns_since_epoch.to_float / Duration.NANOSECONDS_PER_HOUR / 24
+julian-day time/Time -> float:
+  ns := time.ns-since-epoch
+  days := time.ns-since-epoch.to-float / Duration.NANOSECONDS-PER-HOUR / 24
   return days + 2440587.5
 
 /**
 J2000 day number - the number of days including fractional part
   since noon UTC on January 1, 2000.
 */
-days_since_2000 time/Time -> float:
-  seconds := (NOON_2000.to time).in_s
+days-since-2000 time/Time -> float:
+  seconds := (NOON-2000.to time).in-s
   return seconds / (24.0 * 60 * 60 )
 
 /**
 The declination of the Sun for a given time of year.
 */
 declination time/Time -> float:
-  return declination time --time=time --longitude=0.0: | mean_anomaly |
+  return declination time --time=time --longitude=0.0: | mean-anomaly |
     null
 
 /**
@@ -168,10 +168,10 @@ The provided block is called with the transit time for the given
   (or due North in the Southern Hemisphere).
 */
 declination noon/Time --time/Time=noon --longitude/num [block]-> float:
-  fractional_days := days_since_2000 time
+  fractional-days := days-since-2000 time
   // M = mean anomaly.
-  mean_anomaly := degrees_to_radians_
-    (357.5291 + 0.9856474 * fractional_days) % 360.0
+  mean-anomaly := degrees-to-radians_
+    (357.5291 + 0.9856474 * fractional-days) % 360.0
   // Omega = 282.89 degrees (-77.11)
   // L = mean longitude = M + omega.
   // Some pages like https://en.wikipedia.org/wiki/Sunrise_equation and
@@ -202,31 +202,31 @@ declination noon/Time --time/Time=noon --longitude/num [block]-> float:
   //
   // Clearly they are equivalent near the year 2000, but diverge more and more
   // later.  We therefore use the lambda1 method.
-  mean_longitude_deg := (280.460 + 0.9856474 * fractional_days) % 360.0
+  mean-longitude-deg := (280.460 + 0.9856474 * fractional-days) % 360.0
 
-  sin_mean_anomaly := sin mean_anomaly
+  sin-mean-anomaly := sin mean-anomaly
 
   // Equation of the center without accounting for Century.
-  equation_of_the_center_deg := 0.0
-    + 1.9148 * sin_mean_anomaly
-    + 0.0200 * (sin 2.0 * mean_anomaly)
+  equation-of-the-center-deg := 0.0
+    + 1.9148 * sin-mean-anomaly
+    + 0.0200 * (sin 2.0 * mean-anomaly)
 
   // lambda = L + C
-  ecliptic_longitude := degrees_to_radians_
-    mean_longitude_deg + equation_of_the_center_deg
+  ecliptic-longitude := degrees-to-radians_
+    mean-longitude-deg + equation-of-the-center-deg
 
   utc := noon.utc
-  transit_basis := Time.utc --year=utc.year --month=utc.month --day=utc.day --h=12
+  transit-basis := Time.utc --year=utc.year --month=utc.month --day=utc.day --h=12
 
   // Equation of time.
-  transit := (days_since_2000 transit_basis)
+  transit := (days-since-2000 transit-basis)
     - longitude / 360.0
-    + 0.0053 * sin_mean_anomaly
-    - 0.0069 * (sin (2.0 * ecliptic_longitude))
+    + 0.0053 * sin-mean-anomaly
+    - 0.0069 * (sin (2.0 * ecliptic-longitude))
 
-  block.call NOON_2000 + (Duration --ns=(transit * NANOSECONDS_PER_DAY_).to_int)
+  block.call NOON-2000 + (Duration --ns=(transit * NANOSECONDS-PER-DAY_).to-int)
 
-  declination := asin SIN_AXIAL_TILT_ * (sin ecliptic_longitude)
+  declination := asin SIN-AXIAL-TILT_ * (sin ecliptic-longitude)
 
   return declination
 
@@ -239,45 +239,45 @@ This function returns 0.575 degrees (in radians) for an elevation of
   In practice the actual value depends on the weather.
 Only returns non-negative values.
 */
-elevation_correction elevation/num -> float:
-  RADIANS_PER_ARCSECOND ::= PI / 180.0 / 3600.0
-  DEG_85 ::= degrees_to_radians_ 85.0
-  DEG_5 ::= degrees_to_radians_ 5.0
-  DEG_M0_575 ::= degrees_to_radians_ -0.575
-  DEG_M89_99 ::= degrees_to_radians_ -89.99
-  if elevation > DEG_85:
+elevation-correction elevation/num -> float:
+  RADIANS-PER-ARCSECOND ::= PI / 180.0 / 3600.0
+  DEG-85 ::= degrees-to-radians_ 85.0
+  DEG-5 ::= degrees-to-radians_ 5.0
+  DEG-M0-575 ::= degrees-to-radians_ -0.575
+  DEG-M89-99 ::= degrees-to-radians_ -89.99
+  if elevation > DEG-85:
     // 85 to 90 degrees.
     return 0.0
-  if elevation > DEG_5:
+  if elevation > DEG-5:
     // 5 to 85 degrees.
     t := tan elevation
     result := 58.1 / t
     result -= 0.07 / (t * t * t)
     result += 0.000086 / (t * t * t * t * t)
-    return result * RADIANS_PER_ARCSECOND
-  if elevation > DEG_M0_575:
+    return result * RADIANS-PER-ARCSECOND
+  if elevation > DEG-M0-575:
     // -0.575 to 5 degrees
-    h := radians_to_degrees_ elevation
+    h := radians-to-degrees_ elevation
     result := 1735.0
     result -= 518.2 * h
     result += 103.4 * h * h
     result -= 12.79 * h * h * h
     result += 0.711 * h * h * h * h
-    return result * RADIANS_PER_ARCSECOND
-  if elevation > DEG_M89_99:
+    return result * RADIANS-PER-ARCSECOND
+  if elevation > DEG-M89-99:
     // -89.99 to -0.575 degrees
     t := tan elevation
-    return -020.774 * RADIANS_PER_ARCSECOND / t
+    return -020.774 * RADIANS-PER-ARCSECOND / t
   return 0.0
 
-PI_DIV_180_ ::=            PI / 180.0
-PI_DIV_180_RECIPROCAL_ ::= 180.0 / PI
+PI-DIV-180_ ::=            PI / 180.0
+PI-DIV-180-RECIPROCAL_ ::= 180.0 / PI
 
-radians_to_degrees_ radians/num -> float:
-  return radians * PI_DIV_180_RECIPROCAL_
+radians-to-degrees_ radians/num -> float:
+  return radians * PI-DIV-180-RECIPROCAL_
 
-degrees_to_radians_ degrees/num -> float:
-  return degrees * PI_DIV_180_
+degrees-to-radians_ degrees/num -> float:
+  return degrees * PI-DIV-180_
 
 /// The type for sunrise_sunset for the boundary between day and civil twilight.
 GEOMETRIC := 0.0
@@ -289,11 +289,11 @@ NAUTICAL := -12.0
 ASTRONOMICAL := -18.0
 
 /**
-Variant of $sunrise_sunset that takes a date as three ints.
+Variant of $sunrise-sunset that takes a date as three ints.
 */
-sunrise_sunset year/int month/int day/int longitude/num latitude/num type/num=0.0 --noaa_elevation_correction/bool=false -> Transitions:
+sunrise-sunset year/int month/int day/int longitude/num latitude/num type/num=0.0 --noaa-elevation-correction/bool=false -> Transitions:
   time := Time.utc year month day 12
-  return sunrise_sunset time --time=time longitude latitude type --noaa_elevation_correction=noaa_elevation_correction
+  return sunrise-sunset time --time=time longitude latitude type --noaa-elevation-correction=noaa-elevation-correction
 
 /**
 Returns an instance of the $Transitions class containing the sunrise and
@@ -314,78 +314,78 @@ The calculation compensates for the refraction caused by the curvature of the
   atmosphere relative to the Sun's rays.  By default it considers the Sun to
   have set when it is actually 0.833 degrees under the horizon.  Use
   --noaa_elevation_correction to get the slightly smaller correction given by
-  $elevation_correction.
+  $elevation-correction.
 In practice the refraction depends on the weather, so it is merely an
   approximation.  No correction is applied by default for civil, nautical,
   and astronomical dusk.
 */
-sunrise_sunset noon/Time --time/Time=noon longitude/num latitude/num type/num=0.0 --noaa_elevation_correction/bool=false -> Transitions:
+sunrise-sunset noon/Time --time/Time=noon longitude/num latitude/num type/num=0.0 --noaa-elevation-correction/bool=false -> Transitions:
   transit := null
   decl := declination noon --time=time --longitude=longitude: | tr |
     transit = tr
-  latitude_rad := degrees_to_radians_ latitude
-  sin_sin := (sin latitude_rad) * (sin decl)
-  cos_cos := (cos latitude_rad) * (cos decl)
+  latitude-rad := degrees-to-radians_ latitude
+  sin-sin := (sin latitude-rad) * (sin decl)
+  cos-cos := (cos latitude-rad) * (cos decl)
   // subhorizon_angle is thus always negative, and in radians.
   correction/float := ?
-  if noaa_elevation_correction:
-    correction = elevation_correction (degrees_to_radians_ type)
+  if noaa-elevation-correction:
+    correction = elevation-correction (degrees-to-radians_ type)
   else:
-    correction = type == 0 ? (degrees_to_radians_ 0.833) : 0.0
-  subhorizon_angle ::= (degrees_to_radians_ type) - correction
-  acos_input := ((sin subhorizon_angle) - sin_sin) / cos_cos
-  if acos_input < -1.0: return Transitions.light
-  else if acos_input > 1.0: return Transitions.dark
-  else if acos_input.is_nan: return Transitions.light
-  half_day := (acos acos_input) * TWO_PI_RECIPROCAL_  // Time in days from solar noon to sunrise/sunset.
-  half_duration := Duration --ns=(half_day * NANOSECONDS_PER_DAY_).to_int
-  sunrise := transit - half_duration
-  sunset := transit + half_duration
+    correction = type == 0 ? (degrees-to-radians_ 0.833) : 0.0
+  subhorizon-angle ::= (degrees-to-radians_ type) - correction
+  acos-input := ((sin subhorizon-angle) - sin-sin) / cos-cos
+  if acos-input < -1.0: return Transitions.light
+  else if acos-input > 1.0: return Transitions.dark
+  else if acos-input.is-nan: return Transitions.light
+  half-day := (acos acos-input) * TWO-PI-RECIPROCAL_  // Time in days from solar noon to sunrise/sunset.
+  half-duration := Duration --ns=(half-day * NANOSECONDS-PER-DAY_).to-int
+  sunrise := transit - half-duration
+  sunset := transit + half-duration
   return Transitions sunrise sunset
 
 /**
 The position of the sun at a given time and place.
 The elevation is not corrected for the refraction of the atmosphere near the
-  horizon.  If this is desired set $noaa_elevation_correction to be true.
+  horizon.  If this is desired set $noaa-elevation-correction to be true.
 */
-solar_position time/Time longitude/num latitude/num --noaa_elevation_correction/bool=false -> SolarPosition:
-  hour_angle := 0.0
+solar-position time/Time longitude/num latitude/num --noaa-elevation-correction/bool=false -> SolarPosition:
+  hour-angle := 0.0
   decl := declination time --longitude=longitude: | transit |
     difference := transit.to time
     // The Earth rotates one degree each 240 seconds.
-    hour_angle = difference.in_ms / 240_000.0
+    hour-angle = difference.in-ms / 240_000.0
 
-  if hour_angle < -180: hour_angle += 360
-  if hour_angle > 180: hour_angle -= 360
+  if hour-angle < -180: hour-angle += 360
+  if hour-angle > 180: hour-angle -= 360
 
-  hour_angle = degrees_to_radians_ hour_angle
+  hour-angle = degrees-to-radians_ hour-angle
 
-  latitude_rad := degrees_to_radians_ latitude
-  sin_decl := sin decl
-  cos_decl := cos decl
-  sin_latitude := sin latitude_rad
-  cos_latitude := cos latitude_rad
-  cos_hour_angle := cos hour_angle
+  latitude-rad := degrees-to-radians_ latitude
+  sin-decl := sin decl
+  cos-decl := cos decl
+  sin-latitude := sin latitude-rad
+  cos-latitude := cos latitude-rad
+  cos-hour-angle := cos hour-angle
 
-  sin_sin := sin_latitude * sin_decl
-  cos_cos_cos := cos_decl * cos_latitude * cos_hour_angle
+  sin-sin := sin-latitude * sin-decl
+  cos-cos-cos := cos-decl * cos-latitude * cos-hour-angle
 
-  asin_input := sin_sin + cos_cos_cos
+  asin-input := sin-sin + cos-cos-cos
 
-  elevation := asin asin_input
+  elevation := asin asin-input
 
-  sin_cos := sin_decl * cos_latitude
-  cos_cos_sin := cos_hour_angle * cos_decl * sin_latitude
+  sin-cos := sin-decl * cos-latitude
+  cos-cos-sin := cos-hour-angle * cos-decl * sin-latitude
 
-  acos_input := (sin_cos - cos_cos_sin) / (cos elevation)
+  acos-input := (sin-cos - cos-cos-sin) / (cos elevation)
 
   azimuth /float := ?
 
-  azimuth = (-1.0 <= acos_input <= 1.0) ? (acos acos_input) : 0.0
-  if hour_angle > 0:
+  azimuth = (-1.0 <= acos-input <= 1.0) ? (acos acos-input) : 0.0
+  if hour-angle > 0:
     azimuth = 2 * PI - azimuth
 
-  if noaa_elevation_correction:
-    elevation += elevation_correction elevation
+  if noaa-elevation-correction:
+    elevation += elevation-correction elevation
 
-  return SolarPosition azimuth elevation --noaa_elevation_correction=noaa_elevation_correction
+  return SolarPosition azimuth elevation --noaa-elevation-correction=noaa-elevation-correction
